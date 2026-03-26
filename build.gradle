@@ -1,0 +1,94 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.3'
+	id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+	id 'java'
+	id 'jacoco'
+}
+
+group = 'com.puntored.ms-recharge-service'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	springBootVersion = "2.7.3"
+	mapstructVersion = "1.5.2.Final"
+	lombokVersion = "1.18.24"
+	lombokMapstructBindingVersion = "0.2.0"
+	mySqlConnectorVersion = "8.0.32"
+	openApiVersion = "1.6.11"
+    postgresConnectorVersion = "42.6.0"
+    set('springCloudVersion', "2021.0.5")
+
+}
+
+dependencies {
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+	developmentOnly "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
+	testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+
+	//runtimeOnly "mysql:mysql-connector-java:${mySqlConnectorVersion}"
+    runtimeOnly "org.postgresql:postgresql:${postgresConnectorVersion}"
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+	implementation "org.springdoc:springdoc-openapi-ui:${openApiVersion}"
+
+    implementation 'org.flywaydb:flyway-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.11.0'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+
+    //security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-crypto'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+	finalizedBy jacocoTestReport
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/jacocoHtml"))
+    }
+}
